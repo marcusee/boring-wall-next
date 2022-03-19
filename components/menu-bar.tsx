@@ -1,5 +1,12 @@
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import {increment , connectMetaMask } from '../store/reducer/wall.reducer';
+
 
 export default function MenuBar() {
+
+  const dispatch = useAppDispatch();
+
+
   return <nav className="sticky top-0 z-50 flex flex-wrap items-center justify-between px-2 py-2 bg-teal-500 mb-3">
     <div className="container px-4 mx-auto flex flex-wrap items-center justify-between">
       <div className="w-full relative flex justify-between md:w-auto  px-4 md:static md:block md:justify-start">
@@ -17,7 +24,9 @@ export default function MenuBar() {
               <span className="ml-2">About</span>
             </a>
           </li>
-          <button className="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white mt-4 md:mt-0">
+          <button 
+            onClick={() => {dispatch(connectMetaMask())}}
+            className="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white mt-4 md:mt-0">
             {/* {{'Connect Meta Mask'}} */}
             Connect Meta Mask
           </button>
