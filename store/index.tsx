@@ -2,7 +2,11 @@ import thunk from 'redux-thunk';
 import { createStore, applyMiddleware, compose } from 'redux';
 import wallReducer from './reducer/wall.reducer';
 import { configureStore, ThunkAction,  Action } from '@reduxjs/toolkit'
+import { enableMapSet } from 'immer'
+
 // ...
+
+enableMapSet();
 
 export const store = configureStore({
   reducer: {
