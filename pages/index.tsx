@@ -1,8 +1,8 @@
 import MenuBar from "../components/menu-bar";
+import Wall from "../components/wall-component";
 
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import {increment , getNumber } from '../store/reducer/wall.reducer';
-
 
 export default function Home() {
 
@@ -10,21 +10,9 @@ export default function Home() {
   const dispatch = useAppDispatch();
 
   return (
-    <div>
+    <div className="bg-slate-100">
       <MenuBar/>
-      <div>
-        {count}
-      </div>
-
-      <button onClick = {() => dispatch(increment())}>
-        increase
-      </button>
-
-      <br/>
-
-      <button onClick = {() => dispatch(getNumber(2))}>
-        increase asyc
-      </button>
+      <Wall/>
     </div>
   )
 }
