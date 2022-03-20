@@ -11,19 +11,19 @@ import bwallAbi from '../../../boringwall/artifacts/contracts/BoringWall.sol/Bor
 const initialState: WallState = {
   value: 2,
   connected: false,
-  wallChunks : new Map(),
-  headIndex: 0n,
-  tailIndex: 0n,
+  wallChunks : [],
+  headIndex: '0',
+  tailIndex: '0',
   hoveredWallPixel : undefined 
 }; //Initial state
 
 
 export interface WallPixel {
-  id : bigint,
+  id : string,
   color: number;
   colorString : string;
-  xPos: bigint;
-  yPos: bigint;
+  xPos: string;
+  yPos: string;
   created: number;
 
 }
@@ -31,9 +31,9 @@ export interface WallPixel {
 export interface WallState {
   value: number,
   connected : boolean,
-  wallChunks : Map<bigint, Array<WallPixel>>,
-  headIndex : 0n, // track head chunk index
-  tailIndex : 0n  // track tail chunk index
+  wallChunks : WallPixel[][],
+  headIndex : string, // track head chunk index
+  tailIndex : string,  // track tail chunk index
   hoveredWallPixel : WallPixel | undefined
 }
 
@@ -82,11 +82,11 @@ export const fetchFakeChunk = createAsyncThunk(
     for (let i = 0; i < 2048; i++ ) {
       rawBatch.push(
         {
-          id : BigInt(i),
+          id : BigInt(i).toString(),
           color: 0,
           colorString : '#FFFFFF',
-          xPos: BigInt(i) / 32n,
-          yPos: BigInt(i) % 32n,
+          xPos: `${BigInt(i) / 32n}`,
+          yPos: `${BigInt(i) % 32n}`,
           created: 0
         }
       )
@@ -123,7 +123,8 @@ const reducerSlice = createSlice({
         console.log(action);
       })
       .addCase(fetchFakeChunk.fulfilled, (state: WallState, action) => {
-        state.wallChunks.set(state.headIndex, action.payload);
+        state.headIndex = `${BigInt(state.headIndex) + 1n}`;
+        state.wallChunks.push(action.payload);
       });
   }
 });

@@ -13,7 +13,7 @@ export default function Wall() {
         dispatch(fetchFakeChunk(BigInt(0)));
     }, []);
 
-    if (wallChunks.size == 0)
+    if (wallChunks.length === 0)
         return <h2>Loading...</h2>
 
     return (
@@ -23,11 +23,10 @@ export default function Wall() {
                     <div className="hidden md:block sticky top-16 float-right mx-12 ">
                         <WallCoordinateHelper />
                     </div>
-                    <div className="hidden md:block sticky top-12 float-left mx-12">
+                    <div className="hidden md:block sticky top-16 float-left mx-12">
                         ➡️
                     </div>
-                    <WallChunk chunk={wallChunks.get(BigInt(0))} />
-
+                    <WallChunk chunk={wallChunks[0]} />
                 </div>
             </div>
         </div>
@@ -35,7 +34,7 @@ export default function Wall() {
 }
 
 
-export function WallChunk({ chunk }) {
+export function WallChunk( {chunk} : { chunk : Array<WallPixel>  }) {
     useEffect(() => {
 
     }, []);
@@ -51,7 +50,7 @@ export function WallChunk({ chunk }) {
     )
 }
 
-export function WallPixelUI({ pixel }) {
+export function WallPixelUI( {pixel} : { pixel : WallPixel }) {
     const dispatch = useAppDispatch();
 
     return <div onMouseEnter={() => dispatch(hoverOn(pixel))} className="w-4 h-4 hover:border-black hover:border-2" style={{ backgroundColor: pixel.colorString }}></div>
@@ -66,11 +65,11 @@ export function WallCoordinateHelper() {
     }, []);
 
     const getX = () => {
-        return hoveredWallPixel?.xPos.toString() ?? '';
+        return hoveredWallPixel?.xPos ?? '';
     }
 
     const getY = () => {
-        return hoveredWallPixel?.yPos.toString() ?? '';
+        return hoveredWallPixel?.yPos ?? '';
     }
 
     return (
