@@ -13,8 +13,9 @@ const initialState: WallState = {
   connected: false,
   wallChunks : new Map(),
   headIndex: 0n,
-  tailIndex: 0n
-}; //Initial state of the counter
+  tailIndex: 0n,
+  hoveredWallPixel : undefined 
+}; //Initial state
 
 
 export interface WallPixel {
@@ -33,6 +34,7 @@ export interface WallState {
   wallChunks : Map<bigint, Array<WallPixel>>,
   headIndex : 0n, // track head chunk index
   tailIndex : 0n  // track tail chunk index
+  hoveredWallPixel : WallPixel | undefined
 }
 
 export const getNumber = createAsyncThunk(
@@ -83,8 +85,8 @@ export const fetchFakeChunk = createAsyncThunk(
           id : BigInt(i),
           color: 0,
           colorString : '#FFFFFF',
-          xPos: 0n,
-          yPos: 0n,
+          xPos: BigInt(i) / 32n,
+          yPos: BigInt(i) % 32n,
           created: 0
         }
       )
@@ -104,6 +106,9 @@ const reducerSlice = createSlice({
   reducers: {
     increment: state => {
       state.value += 1;
+    },
+    hoverOn : (state, action) => {
+      state.hoveredWallPixel = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -124,6 +129,6 @@ const reducerSlice = createSlice({
 });
 
 
-export const { increment } = reducerSlice.actions
+export const { increment, hoverOn } = reducerSlice.actions
 export const selectWallData = (state: RootState) => state.wallReducer;
 export default reducerSlice.reducer;
