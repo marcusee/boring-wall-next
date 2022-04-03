@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { Props } from "next/script";
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { WallPixel, fetchFakeChunk, hoverOn } from "../store/reducer/wall.reducer";
 
@@ -25,7 +25,7 @@ export default function Wall() {
             <WallCoordinateHelper />
           </div>
           <div className="hidden md:block sticky top-16 float-left mx-12">
-            ➡️
+            <WallCoordinateIndicator />
           </div>
           <WallChunk chunk={wallChunks[0]} />
         </div>
@@ -56,6 +56,7 @@ export function WallPixelUI({ pixel }: { pixel: WallPixel }) {
   const router = useRouter();
 
   return <div
+    data-x = {pixel.yPos}
     onMouseEnter={() => dispatch(hoverOn(pixel))}
     onClick={() => router.push(`/pixel-detail/${pixel.id}`)}
     className="w-4 h-4 hover:border-black hover:border-2"
@@ -88,4 +89,24 @@ export function WallCoordinateHelper() {
       <div > Y : {getY()}</div>
     </div>
   );
+}
+
+export function WallCoordinateIndicator() {
+
+  const [x, setX] = useState('0');
+
+  function updateCoordinate () {
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+    const coordElem : HTMLElement | null = document.elementFromPoint(vw/2, 80) as HTMLElement;
+    const middleX = coordElem?.dataset.x;
+    setX(middleX ?? '0');
+  }
+
+  useEffect(() =>{
+    window.addEventListener('scroll', updateCoordinate, false);
+  }, []);
+
+  return <div>
+    {x} ➡️
+  </div>
 }

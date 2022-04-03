@@ -88,8 +88,8 @@ export const fetchFakeChunk = createAsyncThunk(
           id : BigInt(i).toString(),
           color: 0,
           colorString : '#FFFFFF',
-          xPos: `${BigInt(i) / 32n}`,
-          yPos: `${BigInt(i) % 32n}`,
+          xPos: `${BigInt(i) % 32n}`,
+          yPos: `${BigInt(i) / 32n}`,
           created: 0
         }
       )
@@ -103,12 +103,13 @@ export const fetchFakePixel = createAsyncThunk(
   'wall/fetchFakePixel',
   async (tokenid: bigint) => {
     console.log('yeap');
+    
     return   {
       id : tokenid.toString(),
       color: 0,
       colorString : '#FFFFFF',
-      xPos: `${tokenid / 32n}`,
-      yPos: `${tokenid % 32n}`,
+      xPos: `${tokenid % 32n}`,
+      yPos: `${tokenid / 32n}`,
       created: 0
     };
   }
