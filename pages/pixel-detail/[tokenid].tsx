@@ -12,12 +12,12 @@ export default function PixelDetail() {
   const chunk = useAppSelector(state => state.wallReducer.wallChunks);
 
   useEffect(() => {
-    const id : string = router.query.tokenid?.toString() ?? '0';
+    const id: string = router.query.tokenid?.toString() ?? '0';
     console.log(id);
     dispatch(fetchFakePixel(BigInt(id)));
 
     console.log(chunk);
-  
+
   }, []);
 
   const isOwned = () => {
@@ -46,9 +46,7 @@ export default function PixelDetail() {
       <MenuBar />
       <h2>Loading ....</h2>
     </div>
-    
   }
-
 
   return (
     <div className="bg-slate-100">
@@ -58,6 +56,10 @@ export default function PixelDetail() {
           <h3>Token Id : </h3>
           <div
             className="w-32 h-32 shadow-2xl"
+            style={{
+              backgroundColor: wallPixel.colorString
+            }}
+
           ></div>
 
           <li>
