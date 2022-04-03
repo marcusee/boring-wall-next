@@ -14,7 +14,8 @@ const initialState: WallState = {
   wallChunks : [],
   headIndex: '0',
   tailIndex: '0',
-  hoveredWallPixel : undefined 
+  hoveredWallPixel : undefined ,
+  selected: undefined
 }; //Initial state
 
 
@@ -34,7 +35,8 @@ export interface WallState {
   wallChunks : WallPixel[][],
   headIndex : string, // track head chunk index
   tailIndex : string,  // track tail chunk index
-  hoveredWallPixel : WallPixel | undefined
+  hoveredWallPixel : WallPixel | undefined,
+  selected : WallPixel | undefined,
 }
 
 export const getNumber = createAsyncThunk(
@@ -67,6 +69,7 @@ export const connectMetaMask = createAsyncThunk(
 export const fetchChunk = createAsyncThunk(
   'wall/fetchChunk',
   async (chunkId: bigint) => {
+    
     const response = await Promise.resolve(chunkId);
 
     return response;
@@ -95,6 +98,21 @@ export const fetchFakeChunk = createAsyncThunk(
     return rawBatch;
   }
 )
+
+export const fetchFakePixel = createAsyncThunk(
+  'wall/fetchFakePixel',
+  async (tokenid: bigint) => {
+    console.log('yeap');
+    return   {
+      id : tokenid.toString(),
+      color: 0,
+      colorString : '#FFFFFF',
+      xPos: `${tokenid / 32n}`,
+      yPos: `${tokenid % 32n}`,
+      created: 0
+    };
+  }
+);
 
 function refineRawBatch () {
 
@@ -125,6 +143,11 @@ const reducerSlice = createSlice({
       .addCase(fetchFakeChunk.fulfilled, (state: WallState, action) => {
         state.headIndex = `${BigInt(state.headIndex) + 1n}`;
         state.wallChunks.push(action.payload);
+   
+      })
+      .addCase(fetchFakePixel.fulfilled, (state: WallState, action) => {
+        state.headIndex = `${BigInt(state.headIndex) + 1n}`;
+        state.selected = action.payload;
       });
   }
 });
