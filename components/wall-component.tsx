@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { Props } from "next/script";
 import { useEffect } from "react"
 import { useAppSelector, useAppDispatch } from "../store/hooks";
@@ -52,8 +53,14 @@ export function WallChunk( {chunk} : { chunk : Array<WallPixel>  }) {
 
 export function WallPixelUI( {pixel} : { pixel : WallPixel }) {
     const dispatch = useAppDispatch();
+    const router = useRouter();
 
-    return <div onMouseEnter={() => dispatch(hoverOn(pixel))} className="w-4 h-4 hover:border-black hover:border-2" style={{ backgroundColor: pixel.colorString }}></div>
+    return <div 
+        onMouseEnter={() => dispatch(hoverOn(pixel)) }  
+        onClick={() => router.push(`/pixel-detail/${pixel.id}`)} 
+        className="w-4 h-4 hover:border-black hover:border-2" 
+        style={{ backgroundColor: pixel.colorString }}>
+    </div>
 }
 
 
