@@ -1,22 +1,23 @@
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { fetchFakeChunk, fetchFakePixel, WallPixel } from "../../store/reducer/wall.reducer";
+import { fetchFakeChunk, fetchFakePixel, WallPixel, changeStagingColor } from "../../store/reducer/wall.reducer";
 import MenuBar from "../../components/menu-bar";
+import { SketchPicker } from 'react-color';
 
 export default function PixelDetail() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { tokenId } = router.query;
   const wallPixel = useAppSelector(state => state.wallReducer.selected);
-  const chunk = useAppSelector(state => state.wallReducer.wallChunks);
+  const stagingColor : string = useAppSelector(state => state.wallReducer.stagingColor);
+
+  // const [pixelColor, setPixelColor] = useState();
 
   useEffect(() => {
     const id: string = router.query.tokenid?.toString() ?? '0';
     console.log(id);
     dispatch(fetchFakePixel(BigInt(id)));
-
-    console.log(chunk);
 
   }, []);
 
@@ -24,9 +25,43 @@ export default function PixelDetail() {
     return wallPixel?.created != 0;
   }
 
+  const isOwner= () => {
+    return isOwned();
+    // return isOwned() || true;
+
+  }
+
   let buyDetails;
 
-  if (isOwned()) {
+    console.log(stagingColor);
+
+  if (isOwner()) {
+    buyDetails = <div>
+      <p>You are the owner of this NFT!</p>
+      <p>You can change the color</p>
+
+      <SketchPicker
+        color={stagingColor ?? '#FFFFFF'}
+        onChangeComplete={ (color) => {
+          if (wallPixel) {
+            dispatch(changeStagingColor(color.hex));
+          }
+        }}
+        disableAlpha = {true}
+      />
+
+      <button className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded my-4 mx-2"
+        onClick={() => {
+
+        }}>Save</button>
+
+      <button className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded my-4 mx-2"
+        onClick={() => {
+          dispatch(changeStagingColor(wallPixel?.colorString));
+        }}>Reset</button>
+
+    </div>
+  } else if (isOwned()) {
     buyDetails = <div>
       <p className="break-normal">This NFT is already owned. To buy it view it on Open Sea.</p>
       <a>Open sea link place holder</a>
@@ -55,9 +90,9 @@ export default function PixelDetail() {
         <div className="flex space-y-2 flex-col">
           <h3>Token Id : </h3>
           <div
-            className="w-32 h-32 shadow-2xl"
+            className="w-32 h-32 shadow-2xl "
             style={{
-              backgroundColor: wallPixel.colorString
+              backgroundColor: stagingColor
             }}
 
           ></div>

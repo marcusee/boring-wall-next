@@ -15,7 +15,8 @@ const initialState: WallState = {
   headIndex: '0',
   tailIndex: '0',
   hoveredWallPixel : undefined ,
-  selected: undefined
+  selected: undefined,
+  stagingColor : "#FFFFFF",
 }; //Initial state
 
 
@@ -37,6 +38,7 @@ export interface WallState {
   tailIndex : string,  // track tail chunk index
   hoveredWallPixel : WallPixel | undefined,
   selected : WallPixel | undefined,
+  stagingColor : string,
 }
 
 export const getNumber = createAsyncThunk(
@@ -128,6 +130,9 @@ const reducerSlice = createSlice({
     },
     hoverOn : (state, action) => {
       state.hoveredWallPixel = action.payload;
+    },
+    changeStagingColor : (state, action) => {
+      state.stagingColor = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -149,11 +154,12 @@ const reducerSlice = createSlice({
       .addCase(fetchFakePixel.fulfilled, (state: WallState, action) => {
         state.headIndex = `${BigInt(state.headIndex) + 1n}`;
         state.selected = action.payload;
+        state.stagingColor = action.payload.colorString;
       });
   }
 });
 
 
-export const { increment, hoverOn } = reducerSlice.actions
+export const { increment, hoverOn, changeStagingColor } = reducerSlice.actions
 export const selectWallData = (state: RootState) => state.wallReducer;
 export default reducerSlice.reducer;
