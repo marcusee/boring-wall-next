@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 // import { RootState } from '..';
 import { RootState } from '../index';
 import Web3Modal from 'web3modal';
-import { ethers } from 'ethers';
+import {  ethers } from 'ethers';
 import data from '../../../config/boringwall.json';
 import bwallAbi from '../../../boringwall/artifacts/contracts/BoringWall.sol/BoringWall.json';
 

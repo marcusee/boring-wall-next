@@ -1,12 +1,41 @@
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { increment, connectMetaMask } from '../store/reducer/wall.reducer';
 import Link from 'next/link'
-
+import useContract from '../hooks/use-contract';
+import { useEffect, useState } from 'react';
 
 export default function MenuBar() {
 
   const dispatch = useAppDispatch();
+  const { contract, connect } = useContract();
+  const [connected, setConnected] = useState(false);
 
+  const getContract = async () => {
+    connect();
+  }
+
+
+
+  useEffect(() => {
+    if (window.web3.currentProvider.isMetaMask) {
+      setConnected(true);
+    }
+  }, [contract]);
+
+  let connectMetamask = <button
+    onClick={() => { getContract() }}
+    className="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white mt-4 md:mt-0">
+    {/* {{'Connect Meta Mask'}} */}
+    Connect Meta Mask
+  </button>
+
+  if (connected) {
+    connectMetamask = <button
+      className="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white mt-4 md:mt-0">
+      {/* {{'Connect Meta Mask'}} */}
+      Connected
+    </button>
+  }
 
   return <nav className="sticky top-0 z-50 flex flex-wrap items-center justify-between px-2 py-2 bg-teal-500 mb-3">
     <div className="container px-4 mx-auto flex flex-wrap items-center justify-between">
@@ -27,13 +56,9 @@ export default function MenuBar() {
               <span className="ml-2">About</span>
             </a>
           </li>
-          <button
-            onClick={() => { dispatch(connectMetaMask()) }}
-            className="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white mt-4 md:mt-0">
-            {/* {{'Connect Meta Mask'}} */}
-            Connect Meta Mask
-          </button>
+          {connectMetamask}
         </ul>
+
       </div>
     </div>
   </nav>
