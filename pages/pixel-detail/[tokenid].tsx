@@ -17,9 +17,14 @@ export default function PixelDetail() {
   useEffect(() => {
     const id: string = router.query.tokenid?.toString() ?? '0';
     console.log(id);
-    dispatch(fetchFakePixel(BigInt(id)));
+    // dispatch(fetchFakePixel(BigInt(id)));
 
   }, []);
+
+
+  const  fetchPixel = async (tokenId : bigint) => {
+    return tokenId
+  }
 
   const isOwned = () => {
     return wallPixel?.created != 0;

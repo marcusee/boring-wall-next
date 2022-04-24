@@ -1,18 +1,35 @@
 import { useRouter } from "next/router";
 import { Props } from "next/script";
 import { useEffect, useState } from "react"
+import useContract from "../hooks/use-contract";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
-import { WallPixel, fetchFakeChunk, hoverOn } from "../store/reducer/wall.reducer";
+import { WallPixel, fetchFakeChunk, hoverOn, appendChunk } from "../store/reducer/wall.reducer";
 
 
 
 export default function Wall() {
   const wallChunks = useAppSelector(state => state.wallReducer.wallChunks);
   const dispatch = useAppDispatch();
+  // const contract = useAppSelector(state => state.wallReducer.contract);
+  const {connect, getChunk, connected } = useContract();
 
   useEffect(() => {
-    dispatch(fetchFakeChunk(BigInt(0)));
+    loadChunk();
+
   }, []);
+
+  async function loadChunk() {
+    if (connected()) {
+      console.log('entered here');
+      // const chunk = await getChunk(BigInt(0), BigInt(2048));
+      // console.log(chunk);
+    }
+
+    const response = await fetch('./api/wall');
+    const data = await response.json();
+    // console.log(data);
+    dispatch(appendChunk(data));
+  }
 
   if (wallChunks.length === 0)
     return <h2>Loading...</h2>
@@ -63,8 +80,6 @@ export function WallPixelUI({ pixel }: { pixel: WallPixel }) {
     style={{ backgroundColor: pixel.colorString }}>
   </div>
 }
-
-
 
 export function WallCoordinateHelper() {
   const hoveredWallPixel = useAppSelector(state => state.wallReducer.hoveredWallPixel);

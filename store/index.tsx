@@ -1,17 +1,25 @@
 import thunk from 'redux-thunk';
 import { createStore, applyMiddleware, compose } from 'redux';
 import wallReducer from './reducer/wall.reducer';
-import { configureStore, ThunkAction,  Action } from '@reduxjs/toolkit'
+import { configureStore, ThunkAction,  Action, createSerializableStateInvariantMiddleware } from '@reduxjs/toolkit'
 import { enableMapSet } from 'immer'
 
 // ...
 
 enableMapSet();
 
+const isSerializable = (value: any) => true;
+
+const serializableMiddleware = createSerializableStateInvariantMiddleware({
+  isSerializable,
+  // getEntries,
+})
+
 export const store = configureStore({
   reducer: {
     wallReducer: wallReducer,
-  }
+  },
+  middleware: [serializableMiddleware],
 })
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

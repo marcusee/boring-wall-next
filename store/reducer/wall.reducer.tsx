@@ -17,6 +17,8 @@ const initialState: WallState = {
   hoveredWallPixel : undefined ,
   selected: undefined,
   stagingColor : "#FFFFFF",
+  contract : null,
+  userAddress: '',
 }; //Initial state
 
 
@@ -27,7 +29,6 @@ export interface WallPixel {
   xPos: string;
   yPos: string;
   created: number;
-
 }
 
 export interface WallState {
@@ -39,6 +40,8 @@ export interface WallState {
   hoveredWallPixel : WallPixel | undefined,
   selected : WallPixel | undefined,
   stagingColor : string,
+  contract: any;
+  userAddress: string,
 }
 
 export const getNumber = createAsyncThunk(
@@ -133,6 +136,12 @@ const reducerSlice = createSlice({
     },
     changeStagingColor : (state, action) => {
       state.stagingColor = action.payload;
+    },
+    setUserAddress : (state, action) => {
+      state.userAddress = action.payload;
+    },
+    appendChunk: (state, action) => {
+      state.wallChunks.push(action.payload);
     }
   },
   extraReducers: (builder) => {
@@ -160,6 +169,6 @@ const reducerSlice = createSlice({
 });
 
 
-export const { increment, hoverOn, changeStagingColor } = reducerSlice.actions
+export const { increment, hoverOn, changeStagingColor, setUserAddress, appendChunk } = reducerSlice.actions
 export const selectWallData = (state: RootState) => state.wallReducer;
 export default reducerSlice.reducer;
