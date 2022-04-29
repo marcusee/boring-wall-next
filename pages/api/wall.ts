@@ -12,7 +12,7 @@ export default async function handler(
   const wallService = new WallService();
 
   const startRaw =  req.query.start ?? '0';
-  const limitRaw =  req.query.start ?? '1024';
+  const limitRaw =  req.query.limit ?? '2048';
 
   console.log(startRaw);
   console.log(limitRaw);

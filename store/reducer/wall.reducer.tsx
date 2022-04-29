@@ -142,7 +142,17 @@ const reducerSlice = createSlice({
     },
     appendChunk: (state, action) => {
       state.wallChunks.push(action.payload);
-    }
+      state.headIndex= state.headIndex + 1;
+    },
+    removeOldChunk: (state) => {
+      state.wallChunks.shift();
+    },
+    setHeadIndex: (state, action) => {
+      state.headIndex = action.payload;
+    },
+    onBottom: (state) => {
+
+    },
   },
   extraReducers: (builder) => {
     builder
