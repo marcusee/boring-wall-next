@@ -6,8 +6,6 @@ import {  ethers } from 'ethers';
 import data from '../../../config/boringwall.json';
 import bwallAbi from '../../../boringwall/artifacts/contracts/BoringWall.sol/BoringWall.json';
 
-
-
 const initialState: WallState = {
   value: 2,
   connected: false,
@@ -150,6 +148,9 @@ const reducerSlice = createSlice({
     setHeadIndex: (state, action) => {
       state.headIndex = action.payload;
     },
+    setSelected: (state, action) => {
+      state.selected = action.payload;
+    },
     onBottom: (state) => {
 
     },
@@ -179,6 +180,6 @@ const reducerSlice = createSlice({
 });
 
 
-export const { increment, hoverOn, changeStagingColor, setUserAddress, appendChunk } = reducerSlice.actions
+export const { increment, hoverOn, changeStagingColor, setUserAddress, appendChunk, setSelected } = reducerSlice.actions
 export const selectWallData = (state: RootState) => state.wallReducer;
 export default reducerSlice.reducer;

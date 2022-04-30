@@ -14,9 +14,6 @@ export default async function handler(
   const startRaw =  req.query.start ?? '0';
   const limitRaw =  req.query.limit ?? '2048';
 
-  console.log(startRaw);
-  console.log(limitRaw);
-
   const start : bigint = BigInt(startRaw as string);
   const limit : bigint = BigInt(limitRaw as string);
 

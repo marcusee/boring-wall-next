@@ -56,16 +56,11 @@ export default function Wall() {
     if (loading) {
       return;
     }
-    console.log('getting the thing')
     setLoading(true);
     const start = BigInt(headIndex) * 2048n;
-    console.log(start);
     const url = `./api/wall?limit=2048&start=${start.toString()}`;
-    console.log(url);
     const response = await fetch(`./api/wall?limit=2048&start=${start.toString()}`);
     const data = await response.json();
-    console.log(data);
-    console.log('got the thing');
     dispatch(appendChunk(data));
     setLoading(false);
 

@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { fetchFakeChunk, fetchFakePixel, WallPixel, changeStagingColor } from "../../store/reducer/wall.reducer";
+import { fetchFakeChunk, fetchFakePixel, WallPixel, changeStagingColor, setSelected } from "../../store/reducer/wall.reducer";
 import MenuBar from "../../components/menu-bar";
 import { SketchPicker } from 'react-color';
 
@@ -14,16 +14,19 @@ export default function PixelDetail() {
 
   // const [pixelColor, setPixelColor] = useState();
 
+  // const [stagingColor, setStagingColor] = useState();
+
   useEffect(() => {
     const id: string = router.query.tokenid?.toString() ?? '0';
-    console.log(id);
-    // dispatch(fetchFakePixel(BigInt(id)));
-
+    fetchPixel(BigInt(id));
   }, []);
 
 
-  const  fetchPixel = async (tokenId : bigint) => {
-    return tokenId
+  const fetchPixel = async (tokenId : bigint) => {
+    const response = await fetch(`./api/wall/${tokenId}`);
+    const pixel = await response.json();
+    dispatch(setSelected(pixel));
+    
   }
 
   const isOwned = () => {
@@ -37,8 +40,6 @@ export default function PixelDetail() {
   }
 
   let buyDetails;
-
-    console.log(stagingColor);
 
   if (isOwner()) {
     buyDetails = <div>

@@ -56,4 +56,11 @@ export default class WallService {
       } as WallPixel;
     }
 
+    async getPixel(tokenId : bigint) : Promise<WallPixel> {
+      const contract =  await this.getContract();
+      const rawPixel = await contract.methods.getPixel(tokenId).call();
+      // console.log(contract.methods);
+      console.log(rawPixel);
+      return this.refineRawPixel(rawPixel);
+    }
 }
