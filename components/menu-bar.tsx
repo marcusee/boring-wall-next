@@ -3,24 +3,27 @@ import { increment, connectMetaMask } from '../store/reducer/wall.reducer';
 import Link from 'next/link'
 import useContract from '../hooks/use-contract';
 import { useEffect, useState } from 'react';
+// const { ethereum } = window;
 
 export default function MenuBar() {
 
   const dispatch = useAppDispatch();
-  const { contract, connect } = useContract();
+  const { connect } = useContract();
   const [connected, setConnected] = useState(false);
+  const contractState = useAppSelector(state => state.wallReducer.contract);
 
   const getContract = async () => {
-    connect();
+    // const _contract = await connect();
+    alert(window.web3.currentProvider.isMetaMask);
+    // dispatch(setContract(_contract));
   }
 
-
-
   useEffect(() => {
+    console.log('connected ', window.web3.currentProvider.isMetaMask);
     if (window.web3.currentProvider.isMetaMask) {
       setConnected(true);
     }
-  }, [contract]);
+  }, []);
 
   let connectMetamask = <button
     onClick={() => { getContract() }}

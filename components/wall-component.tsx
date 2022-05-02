@@ -1,18 +1,84 @@
 import { useRouter } from "next/router";
 import { Props } from "next/script";
 import { useEffect, useState } from "react"
+import useContract from "../hooks/use-contract";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
-import { WallPixel, fetchFakeChunk, hoverOn } from "../store/reducer/wall.reducer";
+import { WallPixel, fetchFakeChunk, hoverOn, appendChunk } from "../store/reducer/wall.reducer";
 
 
 
 export default function Wall() {
   const wallChunks = useAppSelector(state => state.wallReducer.wallChunks);
+  const headIndex = useAppSelector(state => state.wallReducer.headIndex);
+
   const dispatch = useAppDispatch();
+  // const contract = useAppSelector(state => state.wallReducer.contract);
+  const { connect, getChunk, connected } = useContract();
 
   useEffect(() => {
-    dispatch(fetchFakeChunk(BigInt(0)));
+    loadChunk();
+
   }, []);
+
+  const [scrollY, setScrollY] = useState(0);
+  const [overBottom, setOverBottom] = useState(false);
+  const [loading, setLoading] = useState(false); // Controls to prevent 2x load
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+
+      if (overBottom && (window.innerHeight + window.scrollY) < document.body.offsetHeight) {
+        setOverBottom(false);
+        console.log(overBottom);
+      } else if (!overBottom && Math.floor(window.innerHeight + window.scrollY) == Math.floor(document.body.offsetHeight)) {
+        console.log('bottom');
+        setOverBottom(true);
+        onBottom();
+      }
+
+      if (window.scrollY === 0) {
+        //  we at top
+        console.log('top');
+      }
+
+    };
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+
+  }, []);
+
+  async function onBottom() {
+    if (loading) {
+      return;
+    }
+    setLoading(true);
+    const start = BigInt(headIndex) * 2048n;
+    const url = `./api/wall?limit=2048&start=${start.toString()}`;
+    const response = await fetch(`./api/wall?limit=2048&start=${start.toString()}`);
+    const data = await response.json();
+    dispatch(appendChunk(data));
+    setLoading(false);
+
+  }
+
+
+  async function loadChunk() {
+    if (connected()) {
+      console.log('entered here');
+      // const chunk = await getChunk(BigInt(0), BigInt(2048));
+      // console.log(chunk);
+    }
+
+    const response = await fetch('./api/wall');
+    const data = await response.json();
+    // console.log(data);
+    dispatch(appendChunk(data));
+  }
 
   if (wallChunks.length === 0)
     return <h2>Loading...</h2>
@@ -27,13 +93,16 @@ export default function Wall() {
           <div className="hidden md:block sticky top-16 float-left mx-12">
             <WallCoordinateIndicator />
           </div>
-          <WallChunk chunk={wallChunks[0]} />
+          <div className="grid content-center grid-cols-32 gap-0 shadow-xl">
+            {wallChunks.map((chunk: Array<WallPixel>, key: any) => (
+              <WallChunk chunk={chunk} />
+            ))}
+          </div>
         </div>
       </div>
     </div>
   )
 }
-
 
 export function WallChunk({ chunk }: { chunk: Array<WallPixel> }) {
   useEffect(() => {
@@ -41,13 +110,13 @@ export function WallChunk({ chunk }: { chunk: Array<WallPixel> }) {
   }, []);
 
   return (
-    <div className="grid content-center grid-cols-32 gap-0 shadow-xl">
+    <>
       {
         chunk?.map((value: WallPixel, key: any) => {
           return <WallPixelUI key={key} pixel={value} />
         })
       }
-    </div>
+    </>
   )
 }
 
@@ -56,15 +125,13 @@ export function WallPixelUI({ pixel }: { pixel: WallPixel }) {
   const router = useRouter();
 
   return <div
-    data-x = {pixel.yPos}
+    data-x={pixel.yPos}
     onMouseEnter={() => dispatch(hoverOn(pixel))}
     onClick={() => router.push(`/pixel-detail/${pixel.id}`)}
     className="w-4 h-4 hover:border-black hover:border-2"
     style={{ backgroundColor: pixel.colorString }}>
   </div>
 }
-
-
 
 export function WallCoordinateHelper() {
   const hoveredWallPixel = useAppSelector(state => state.wallReducer.hoveredWallPixel);
@@ -95,14 +162,14 @@ export function WallCoordinateIndicator() {
 
   const [x, setX] = useState('0');
 
-  function updateCoordinate () {
+  function updateCoordinate() {
     const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
-    const coordElem : HTMLElement | null = document.elementFromPoint(vw/2, 80) as HTMLElement;
+    const coordElem: HTMLElement | null = document.elementFromPoint(vw / 2, 80) as HTMLElement;
     const middleX = coordElem?.dataset.x;
     setX(middleX ?? '0');
   }
 
-  useEffect(() =>{
+  useEffect(() => {
     window.addEventListener('scroll', updateCoordinate, false);
   }, []);
 

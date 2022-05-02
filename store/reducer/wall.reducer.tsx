@@ -6,8 +6,6 @@ import {  ethers } from 'ethers';
 import data from '../../../config/boringwall.json';
 import bwallAbi from '../../../boringwall/artifacts/contracts/BoringWall.sol/BoringWall.json';
 
-
-
 const initialState: WallState = {
   value: 2,
   connected: false,
@@ -17,6 +15,8 @@ const initialState: WallState = {
   hoveredWallPixel : undefined ,
   selected: undefined,
   stagingColor : "#FFFFFF",
+  contract : null,
+  userAddress: '',
 }; //Initial state
 
 
@@ -27,7 +27,6 @@ export interface WallPixel {
   xPos: string;
   yPos: string;
   created: number;
-
 }
 
 export interface WallState {
@@ -39,6 +38,8 @@ export interface WallState {
   hoveredWallPixel : WallPixel | undefined,
   selected : WallPixel | undefined,
   stagingColor : string,
+  contract: any;
+  userAddress: string,
 }
 
 export const getNumber = createAsyncThunk(
@@ -133,7 +134,26 @@ const reducerSlice = createSlice({
     },
     changeStagingColor : (state, action) => {
       state.stagingColor = action.payload;
-    }
+    },
+    setUserAddress : (state, action) => {
+      state.userAddress = action.payload;
+    },
+    appendChunk: (state, action) => {
+      state.wallChunks.push(action.payload);
+      state.headIndex= state.headIndex + 1;
+    },
+    removeOldChunk: (state) => {
+      state.wallChunks.shift();
+    },
+    setHeadIndex: (state, action) => {
+      state.headIndex = action.payload;
+    },
+    setSelected: (state, action) => {
+      state.selected = action.payload;
+    },
+    onBottom: (state) => {
+
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -160,6 +180,6 @@ const reducerSlice = createSlice({
 });
 
 
-export const { increment, hoverOn, changeStagingColor } = reducerSlice.actions
+export const { increment, hoverOn, changeStagingColor, setUserAddress, appendChunk, setSelected } = reducerSlice.actions
 export const selectWallData = (state: RootState) => state.wallReducer;
 export default reducerSlice.reducer;
