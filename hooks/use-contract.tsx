@@ -1,5 +1,5 @@
 import Web3Modal from 'web3modal';
-import { ethers, providers } from 'ethers';
+import { BigNumber, ethers, providers } from 'ethers';
 import data from '../../config/boringwall.json';
 import bwallAbi from '../../boringwall/artifacts/contracts/BoringWall.sol/BoringWall.json';
 import { useState } from 'react';
@@ -12,7 +12,9 @@ export default function useContract() {
 
   const getContract = async () => {
     try {
-      const web3Modal = new Web3Modal();
+      const web3Modal = new Web3Modal({
+        network : 'localhost'
+      });
       const connection = await web3Modal.connect();
       const provider = new ethers.providers.Web3Provider(connection);
       const signer = provider.getSigner();
@@ -45,8 +47,11 @@ export default function useContract() {
 
   const buyPixel = async (tokenId : bigint) => {
     const contract = await getContract();
-    const output = await contract?.buyPixel(tokenId, 0);
-    console.log(output);
+    const rawPrice : BigNumber = await contract.getPrice();
+    let price = ethers.utils.formatUnits(rawPrice.toString(), 'ether')
+    const transaction = await contract?.buyPixel(tokenId, 0, {value : rawPrice});
+    await transaction.wait();
+    console.log('done');
   }
 
   const refinedChunk = async (rawChunk : []) => {
