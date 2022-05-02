@@ -43,6 +43,12 @@ export default function useContract() {
     return rawChunk;
   }
 
+  const buyPixel = async (tokenId : bigint) => {
+    const contract = await getContract();
+    const output = await contract?.buyPixel(tokenId, 0);
+    console.log(output);
+  }
+
   const refinedChunk = async (rawChunk : []) => {
 
     const chunk = [];
@@ -59,8 +65,19 @@ export default function useContract() {
 
   }
 
+  const isOwner = async (tokenId : bigint) : Promise<boolean> => {
+    const contract =  await getContract();
+    const rawPixel = await contract.getPixel(tokenId);
+
+    console.log(rawPixel[2].gt(0));
+    if (rawPixel[2].gt(0)) {
+      return await contract?.ownerOf(tokenId) ?? false;
+    }
+
+    return false;
+  };
+
   const connected = () => window.web3.currentProvider.isMetaMask;
 
-
-  return { connect, getChunk, connected };
+  return { connect, getChunk, connected, isOwner, buyPixel };
 }

@@ -4,17 +4,16 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchFakeChunk, fetchFakePixel, WallPixel, changeStagingColor, setSelected } from "../../store/reducer/wall.reducer";
 import MenuBar from "../../components/menu-bar";
 import { SketchPicker } from 'react-color';
+import useContract from "../../hooks/use-contract";
 
 export default function PixelDetail() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { tokenId } = router.query;
   const wallPixel = useAppSelector(state => state.wallReducer.selected);
   const stagingColor : string = useAppSelector(state => state.wallReducer.stagingColor);
-
-  // const [pixelColor, setPixelColor] = useState();
-
-  // const [stagingColor, setStagingColor] = useState();
+  const [isOwner, setIsOwner] = useState<boolean>();
+  const [tokenId, setTokenId] = useState<bigint>(0n);
+  const contract = useContract();
 
   useEffect(() => {
     const id: string = router.query.tokenid?.toString() ?? '0';
@@ -23,25 +22,31 @@ export default function PixelDetail() {
 
 
   const fetchPixel = async (tokenId : bigint) => {
-    const response = await fetch(`./api/wall/${tokenId}`);
+    const response = await fetch(`../api/wall/${tokenId}`);
+    setTokenId(tokenId);
+
     const pixel = await response.json();
     dispatch(setSelected(pixel));
-    
+
+    if (contract.connected()) {
+      const owner : boolean = await contract.isOwner(tokenId);
+      setIsOwner(owner);
+    }
   }
+
+  const onBuyNFT = async () => {
+    await contract.buyPixel(tokenId);
+
+  };
 
   const isOwned = () => {
     return wallPixel?.created != 0;
   }
 
-  const isOwner= () => {
-    return isOwned();
-    // return isOwned() || true;
-
-  }
 
   let buyDetails;
 
-  if (isOwner()) {
+  if (isOwner) {
     buyDetails = <div>
       <p>You are the owner of this NFT!</p>
       <p>You can change the color</p>
@@ -77,7 +82,7 @@ export default function PixelDetail() {
       <p>This NFT is not owned! Be the first!</p>
       <button className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded"
         onClick={() => {
-
+          onBuyNFT();
         }}>Buy</button>
     </div>
   }
