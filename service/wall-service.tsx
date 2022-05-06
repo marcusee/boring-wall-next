@@ -43,16 +43,15 @@ export default class WallService {
     }
 
     refineRawPixel(rawPixel: Array<any>) : WallPixel {
-      
       const tokenId = BigInt(rawPixel[0]);
 
       return {
         id : tokenId.toString(),
-        color: 0,
-        colorString : '#FFFFFF',
+        color: rawPixel[1],
+        colorString : '#' + parseInt(rawPixel[1]).toString(16).toUpperCase(),
         xPos: `${BigInt(tokenId) % 32n}`,
         yPos: `${BigInt(tokenId) / 32n}`,
-        created: 0
+        created: rawPixel[2]
       } as WallPixel;
     }
 
@@ -60,7 +59,7 @@ export default class WallService {
       const contract =  await this.getContract();
       const rawPixel = await contract.methods.getPixel(tokenId).call();
       // console.log(contract.methods);
-      console.log(rawPixel);
+      console.log('raw pixel', rawPixel, rawPixel.tokenId);
       return this.refineRawPixel(rawPixel);
     }
 }

@@ -45,29 +45,17 @@ export default function useContract() {
     return rawChunk;
   }
 
-  const buyPixel = async (tokenId : bigint) => {
+  const buyPixel = async (tokenId : bigint, color : string) => {
     const contract = await getContract();
     const rawPrice : BigNumber = await contract.getPrice();
-    let price = ethers.utils.formatUnits(rawPrice.toString(), 'ether')
-    const transaction = await contract?.buyPixel(tokenId, 0, {value : rawPrice});
-    await transaction.wait();
-    console.log('done');
-  }
-
-  const refinedChunk = async (rawChunk : []) => {
-
-    const chunk = [];
-
-    for (let rawPixel of rawChunk) {
-      chunk.push(
-        {
-          id : 1
-        }
-      );
-    }
-
-    return chunk;
-
+    // let price = ethers.utils.formatUnits(rawPrice.toString(), 'ether')
+    const transaction = await contract?.buyPixel(
+      tokenId, 
+      BigInt(parseInt(color.slice(1), 16)), 
+      {value : rawPrice}
+    );
+    const output = await transaction.wait();
+    console.log(output);
   }
 
   const isOwner = async (tokenId : bigint) : Promise<boolean> => {

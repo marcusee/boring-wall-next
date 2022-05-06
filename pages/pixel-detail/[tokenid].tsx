@@ -10,9 +10,10 @@ export default function PixelDetail() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const wallPixel = useAppSelector(state => state.wallReducer.selected);
-  const stagingColor : string = useAppSelector(state => state.wallReducer.stagingColor);
+  const stagingColor: string = useAppSelector(state => state.wallReducer.stagingColor);
   const [isOwner, setIsOwner] = useState<boolean>();
   const [tokenId, setTokenId] = useState<bigint>(0n);
+  const [buyMode, setBuyMode] = useState<boolean>(false);
   const contract = useContract();
 
   useEffect(() => {
@@ -21,7 +22,7 @@ export default function PixelDetail() {
   }, []);
 
 
-  const fetchPixel = async (tokenId : bigint) => {
+  const fetchPixel = async (tokenId: bigint) => {
     const response = await fetch(`../api/wall/${tokenId}`);
     setTokenId(tokenId);
 
@@ -29,22 +30,38 @@ export default function PixelDetail() {
     dispatch(setSelected(pixel));
 
     if (contract.connected()) {
-      const owner : boolean = await contract.isOwner(tokenId);
+      const owner: boolean = await contract.isOwner(tokenId);
       setIsOwner(owner);
     }
+    console.log(pixel);
   }
 
   const onBuyNFT = async () => {
-    await contract.buyPixel(tokenId);
-
+    await contract.buyPixel(
+      tokenId,
+      stagingColor
+    );
+    fetchPixel(BigInt(tokenId));
   };
 
   const isOwned = () => {
     return wallPixel?.created != 0;
   }
 
-
   let buyDetails;
+
+  let buyModeDiv = <div>
+    <p>Change NFT color before you buy!</p>
+    <SketchPicker
+      color={stagingColor ?? '#FFFFFF'}
+      onChangeComplete={(color) => {
+        if (wallPixel) {
+          dispatch(changeStagingColor(color.hex));
+        }
+      }}
+      disableAlpha={true}
+    />
+  </div>
 
   if (isOwner) {
     buyDetails = <div>
@@ -53,12 +70,12 @@ export default function PixelDetail() {
 
       <SketchPicker
         color={stagingColor ?? '#FFFFFF'}
-        onChangeComplete={ (color) => {
+        onChangeComplete={(color) => {
           if (wallPixel) {
             dispatch(changeStagingColor(color.hex));
           }
         }}
-        disableAlpha = {true}
+        disableAlpha={true}
       />
 
       <button className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded my-4 mx-2"
@@ -80,12 +97,21 @@ export default function PixelDetail() {
   } else {
     buyDetails = <div className="flex flex-col space-y-2">
       <p>This NFT is not owned! Be the first!</p>
+      {
+        buyMode && buyModeDiv
+      }
       <button className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded"
         onClick={() => {
-          onBuyNFT();
+          if (buyMode) {
+            onBuyNFT();
+          } else {
+            setBuyMode(true);
+          }
         }}>Buy</button>
     </div>
   }
+
+
 
   if (wallPixel == undefined) {
     return <div>
