@@ -45,6 +45,17 @@ export default function useContract() {
     return rawChunk;
   }
 
+  const changePixelColor = async (tokenId: bigint, color : string) => {
+    const contract = await getContract();
+    const fee : BigNumber = await contract.getChangeFee();
+    const transaction = await contract?.changePixelColor(
+      tokenId, 
+      BigInt(parseInt(color.slice(1), 16)), 
+      {value : fee}
+    );
+    const output = await transaction.wait();
+  };
+
   const buyPixel = async (tokenId : bigint, color : string) => {
     const contract = await getContract();
     const rawPrice : BigNumber = await contract.getPrice();
@@ -55,7 +66,6 @@ export default function useContract() {
       {value : rawPrice}
     );
     const output = await transaction.wait();
-    console.log(output);
   }
 
   const isOwner = async (tokenId : bigint) : Promise<boolean> => {
@@ -72,5 +82,5 @@ export default function useContract() {
 
   const connected = () => window.web3.currentProvider.isMetaMask;
 
-  return { connect, getChunk, connected, isOwner, buyPixel };
+  return { connect, getChunk, connected, isOwner, buyPixel, changePixelColor };
 }
