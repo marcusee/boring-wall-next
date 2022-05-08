@@ -48,7 +48,11 @@ export default class WallService {
       return {
         id : tokenId.toString(),
         color: rawPixel[1],
-        colorString : '#' + parseInt(rawPixel[1]).toString(16).toUpperCase(),
+        colorString : '#' +
+          parseInt(rawPixel[1])
+            .toString(16)
+            .padStart(6, '0')
+            .toUpperCase(),
         xPos: `${BigInt(tokenId) % 32n}`,
         yPos: `${BigInt(tokenId) / 32n}`,
         created: rawPixel[2]
