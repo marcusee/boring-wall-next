@@ -44,6 +44,14 @@ export default function PixelDetail() {
     fetchPixel(BigInt(tokenId));
   };
 
+  const onChangeNFTColor = async () => {
+    await contract.changePixelColor(
+      tokenId,
+      stagingColor
+    );
+    fetchPixel(BigInt(tokenId));
+  }
+
   const isOwned = () => {
     return wallPixel?.created != 0;
   }
@@ -66,7 +74,7 @@ export default function PixelDetail() {
   if (isOwner) {
     buyDetails = <div>
       <p>You are the owner of this NFT!</p>
-      <p>You can change the color</p>
+      <p>You can change the color.</p>
 
       <SketchPicker
         color={stagingColor ?? '#FFFFFF'}
@@ -80,7 +88,7 @@ export default function PixelDetail() {
 
       <button className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded my-4 mx-2"
         onClick={() => {
-
+          onChangeNFTColor();
         }}>Save</button>
 
       <button className="bg-teal-500 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded my-4 mx-2"
