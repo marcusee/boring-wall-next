@@ -3,11 +3,6 @@ import { WallPixel } from './../../../store/reducer/wall.reducer';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import WallService from '../../../service/wall-service';
 
-type Data = {
-  name: string
-
-}
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<WallPixel>
