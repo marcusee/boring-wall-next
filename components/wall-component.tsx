@@ -56,14 +56,7 @@ export default function Wall() {
     if (loading) {
       return;
     }
-    setLoading(true);
-    const start = BigInt(headIndex) * 2048n;
-    const url = `./api/wall?limit=2048&start=${start.toString()}`;
-    const response = await fetch(`./api/wall?limit=2048&start=${start.toString()}`);
-    const data = await response.json();
-    dispatch(appendChunk(data));
-    setLoading(false);
-
+    await loadChunk();
   }
 
 
@@ -73,11 +66,13 @@ export default function Wall() {
       // const chunk = await getChunk(BigInt(0), BigInt(2048));
       // console.log(chunk);
     }
-
-    const response = await fetch('./api/wall');
+    setLoading(true);
+    const start = BigInt(headIndex) * 2048n;
+    console.log('start' , start);
+    const response = await fetch(`./api/wall?limit=2048&start=${start.toString()}`);
     const data = await response.json();
-    // console.log(data);
     dispatch(appendChunk(data));
+    setLoading(false);
   }
 
   if (wallChunks.length === 0)
@@ -95,7 +90,7 @@ export default function Wall() {
           </div>
           <div className="grid content-center grid-cols-32 gap-0 shadow-xl">
             {wallChunks.map((chunk: Array<WallPixel>, key: any) => (
-              <WallChunk chunk={chunk} />
+              <WallChunk key={key} chunk={chunk} />
             ))}
           </div>
         </div>
