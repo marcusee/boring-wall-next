@@ -1,9 +1,9 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react"
-import { MoonLoader, GridLoader } from "react-spinners";
+import { GridLoader } from "react-spinners";
 import useContract from "../hooks/use-contract";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
-import { WallPixel, fetchFakeChunk, hoverOn, appendChunk, setHeadIndex } from "../store/reducer/wall.reducer";
+import { WallPixel, hoverOn, appendChunk } from "../store/reducer/wall.reducer";
 
 
 
@@ -40,7 +40,6 @@ export default function Wall() {
 
   };
 
-
   useEffect(() => {
     console.log('updating')
     handleScroll();
@@ -64,17 +63,14 @@ export default function Wall() {
       console.log('entered here');
     }
     setLoading(true);
-    console.log(headIndex);
     const start = BigInt(headIndex) * 2048n;
     const url = `./api/wall?limit=2048&start=${start.toString()}`;
     const response = await fetch(url);
     const data = await response.json();
     const newIndex = headIndex + 1n;
     setHeadIndex(newIndex);
-    console.log('new head index == ',headIndex, newIndex);
     dispatch(appendChunk(data));
     setLoading(false);
-    // window.removeEventListener("scroll", handleScroll);
 
   }
 
