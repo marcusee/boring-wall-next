@@ -140,7 +140,7 @@ const reducerSlice = createSlice({
     },
     appendChunk: (state, action) => {
       state.wallChunks.push(action.payload);
-      state.headIndex= state.headIndex + 1;
+      state.headIndex = (BigInt(state.headIndex) + 1n).toString();
     },
     removeOldChunk: (state) => {
       state.wallChunks.shift();
@@ -180,6 +180,6 @@ const reducerSlice = createSlice({
 });
 
 
-export const { increment, hoverOn, changeStagingColor, setUserAddress, appendChunk, setSelected } = reducerSlice.actions
+export const { increment, hoverOn, changeStagingColor, setUserAddress, appendChunk, setSelected, setHeadIndex } = reducerSlice.actions
 export const selectWallData = (state: RootState) => state.wallReducer;
 export default reducerSlice.reducer;

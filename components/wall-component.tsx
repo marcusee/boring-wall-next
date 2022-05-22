@@ -1,18 +1,17 @@
 import { useRouter } from "next/router";
-import { Props } from "next/script";
 import { useEffect, useState } from "react"
+import { MoonLoader, GridLoader } from "react-spinners";
 import useContract from "../hooks/use-contract";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
-import { WallPixel, fetchFakeChunk, hoverOn, appendChunk } from "../store/reducer/wall.reducer";
+import { WallPixel, fetchFakeChunk, hoverOn, appendChunk, setHeadIndex } from "../store/reducer/wall.reducer";
 
 
 
 export default function Wall() {
   const wallChunks = useAppSelector(state => state.wallReducer.wallChunks);
-  const headIndex = useAppSelector(state => state.wallReducer.headIndex);
+  const tailIndex = useAppSelector(state => state.wallReducer.tailIndex);
 
   const dispatch = useAppDispatch();
-  // const contract = useAppSelector(state => state.wallReducer.contract);
   const { connect, getChunk, connected } = useContract();
 
   useEffect(() => {
@@ -20,29 +19,30 @@ export default function Wall() {
 
   }, []);
 
-  const [scrollY, setScrollY] = useState(0);
   const [overBottom, setOverBottom] = useState(false);
-  const [loading, setLoading] = useState(false); // Controls to prevent 2x load
+  const [loading, setLoading] = useState<boolean>(false); // Controls to prevent 2x load
+  const [headIndex, setHeadIndex] = useState<bigint>(0n);
+
+  const handleScroll = () => {
+    if (overBottom && (window.innerHeight + window.scrollY) < document.body.offsetHeight) {
+      setOverBottom(false);
+      console.log(overBottom);
+    } else if (!overBottom && Math.floor(window.innerHeight + window.scrollY) == Math.floor(document.body.offsetHeight)) {
+      console.log('bottom');
+      setOverBottom(true);
+      onBottom();
+    }
+
+    if (window.scrollY === 0) {
+      //  we at top
+      console.log('top');
+    }
+
+  };
+
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-
-      if (overBottom && (window.innerHeight + window.scrollY) < document.body.offsetHeight) {
-        setOverBottom(false);
-        console.log(overBottom);
-      } else if (!overBottom && Math.floor(window.innerHeight + window.scrollY) == Math.floor(document.body.offsetHeight)) {
-        console.log('bottom');
-        setOverBottom(true);
-        onBottom();
-      }
-
-      if (window.scrollY === 0) {
-        //  we at top
-        console.log('top');
-      }
-
-    };
+    console.log('updating')
     handleScroll();
 
     window.addEventListener("scroll", handleScroll);
@@ -50,7 +50,7 @@ export default function Wall() {
       window.removeEventListener("scroll", handleScroll);
     };
 
-  }, []);
+  });
 
   async function onBottom() {
     if (loading) {
@@ -59,20 +59,23 @@ export default function Wall() {
     await loadChunk();
   }
 
-
   async function loadChunk() {
     if (connected()) {
       console.log('entered here');
-      // const chunk = await getChunk(BigInt(0), BigInt(2048));
-      // console.log(chunk);
     }
     setLoading(true);
+    console.log(headIndex);
     const start = BigInt(headIndex) * 2048n;
-    console.log('start' , start);
-    const response = await fetch(`./api/wall?limit=2048&start=${start.toString()}`);
+    const url = `./api/wall?limit=2048&start=${start.toString()}`;
+    const response = await fetch(url);
     const data = await response.json();
+    const newIndex = headIndex + 1n;
+    setHeadIndex(newIndex);
+    console.log('new head index == ',headIndex, newIndex);
     dispatch(appendChunk(data));
     setLoading(false);
+    // window.removeEventListener("scroll", handleScroll);
+
   }
 
   if (wallChunks.length === 0)
@@ -81,6 +84,7 @@ export default function Wall() {
   return (
     <div>
       <div className="flex mt-12 items-center w-full flex-col items-center">
+        {tailIndex != '0' && <GridLoader />}
         <div className="relative">
           <div className="hidden md:block sticky top-16 float-right mx-12 ">
             <WallCoordinateHelper />
@@ -94,6 +98,8 @@ export default function Wall() {
             ))}
           </div>
         </div>
+        <div className="py-2"></div>
+        <GridLoader />
       </div>
     </div>
   )
