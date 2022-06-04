@@ -12,7 +12,7 @@ export default async function handler(
   const wallService = new WallService();
 
   const startRaw =  req.query.start ?? '0';
-  const limitRaw =  req.query.limit ?? '2048';
+  const limitRaw =  req.query.limit ?? '1024';
 
   const start : bigint = BigInt(startRaw as string);
   const limit : bigint = BigInt(limitRaw as string);

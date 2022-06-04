@@ -15,9 +15,13 @@ export default function Wall() {
   const { connect, getChunk, connected } = useContract();
 
   useEffect(() => {
-    loadChunk();
+    initLoad();
 
   }, []);
+
+  const initLoad = async () => {
+    await loadChunk();
+  }
 
   const [overBottom, setOverBottom] = useState(false);
   const [loading, setLoading] = useState<boolean>(false); // Controls to prevent 2x load
@@ -26,9 +30,7 @@ export default function Wall() {
   const handleScroll = () => {
     if (overBottom && (window.innerHeight + window.scrollY) < document.body.offsetHeight) {
       setOverBottom(false);
-      console.log(overBottom);
     } else if (!overBottom && Math.floor(window.innerHeight + window.scrollY) == Math.floor(document.body.offsetHeight)) {
-      console.log('bottom');
       setOverBottom(true);
       onBottom();
     }
@@ -41,7 +43,6 @@ export default function Wall() {
   };
 
   useEffect(() => {
-    console.log('updating')
     handleScroll();
 
     window.addEventListener("scroll", handleScroll);
@@ -50,6 +51,15 @@ export default function Wall() {
     };
 
   });
+
+  useEffect(() => {
+    const list : any = document.getElementById('list');
+    if (list == null) return;
+    if(list.clientHeight <= window.innerHeight && list.clientHeight) {
+      loadChunk();
+
+    }
+  },[wallChunks]);
 
   async function onBottom() {
     if (loading) {
@@ -62,24 +72,26 @@ export default function Wall() {
     if (connected()) {
       console.log('entered here');
     }
-    setLoading(true);
-    const start = BigInt(headIndex) * 2048n;
-    const url = `./api/wall?limit=2048&start=${start.toString()}`;
-    const response = await fetch(url);
-    const data = await response.json();
     const newIndex = headIndex + 1n;
     setHeadIndex(newIndex);
-    dispatch(appendChunk(data));
+    setLoading(true);
+    const start = BigInt(headIndex) * 1024n;
+    const url = `./api/wall?limit=1024&start=${start.toString()}`;
+    const response = await fetch(url);
+    const data = await response.json();
     setLoading(false);
+    dispatch(appendChunk(data));
 
   }
 
   if (wallChunks.length === 0)
-    return <h2>Loading...</h2>
+    return <div className="flex my-12 flex-col items-center">
+        <GridLoader />
+    </div>
 
   return (
     <div>
-      <div className="flex mt-12 items-center w-full flex-col items-center">
+      <div id="list" className="flex mt-12 items-center w-full flex-col items-center">
         {tailIndex != '0' && <GridLoader />}
         <div className="relative">
           <div className="hidden md:block sticky top-16 float-right mx-12 ">
