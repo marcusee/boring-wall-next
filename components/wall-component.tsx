@@ -12,7 +12,6 @@ export default function Wall() {
   const tailIndex = useAppSelector(state => state.wallReducer.tailIndex);
 
   const dispatch = useAppDispatch();
-  const { connect, getChunk, connected } = useContract();
 
   useEffect(() => {
     initLoad();
@@ -69,9 +68,6 @@ export default function Wall() {
   }
 
   async function loadChunk() {
-    if (connected()) {
-      console.log('entered here');
-    }
     const newIndex = headIndex + 1n;
     setHeadIndex(newIndex);
     setLoading(true);

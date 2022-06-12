@@ -9,7 +9,6 @@ import { ConnectButton } from "web3uikit"
 export default function MenuBar() {
 
   const dispatch = useAppDispatch();
-  const { connect } = useContract();
   const [connected, setConnected] = useState(false);
   const contractState = useAppSelector(state => state.wallReducer.contract);
 
