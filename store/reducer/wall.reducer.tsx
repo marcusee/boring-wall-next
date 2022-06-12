@@ -105,8 +105,6 @@ export const fetchFakeChunk = createAsyncThunk(
 export const fetchFakePixel = createAsyncThunk(
   'wall/fetchFakePixel',
   async (tokenid: bigint) => {
-    console.log('yeap');
-    
     return   {
       id : tokenid.toString(),
       color: 0,
