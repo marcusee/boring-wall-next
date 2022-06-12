@@ -2,8 +2,9 @@ import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { increment, connectMetaMask } from '../store/reducer/wall.reducer';
 import Link from 'next/link'
 import useContract from '../hooks/use-contract';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 // const { ethereum } = window;
+import { ConnectButton } from "web3uikit"
 
 export default function MenuBar() {
 
@@ -59,7 +60,7 @@ export default function MenuBar() {
               <span className="ml-2">About</span>
             </a>
           </li>
-          {connectMetamask}
+          <ConnectButton moralisAuth={false}/>
         </ul>
 
       </div>
