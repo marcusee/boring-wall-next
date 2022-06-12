@@ -5,10 +5,16 @@ import bwallAbi from '../../boringwall/artifacts/contracts/BoringWall.sol/Boring
 import { useState } from 'react';
 import { useAppDispatch } from '../store/hooks';
 import { setUserAddress } from '../store/reducer/wall.reducer';
+import { useWeb3Contract } from 'react-moralis';
 
 export default function useContract() {
 
   const dispatch = useAppDispatch();
+
+  const contractTemplate = {
+    abi: bwallAbi.abi,
+    contractAddress:   data.address,
+  }
 
   const getContract = async () => {
     try {
@@ -35,25 +41,30 @@ export default function useContract() {
     }
   }
 
+
   const connect = async () => {
     return await getContract();
   };
 
-  const getChunk = async (start : bigint, limit : bigint) => {
-    const contract = await getContract();
-    const rawChunk = await contract.getBatched(start, limit);
-    return rawChunk;
-  }
+  const changePixelColor = async (tokenId: bigint, color : string, onSuccess: (tx : any) => void,  ) => {
 
-  const changePixelColor = async (tokenId: bigint, color : string) => {
-    const contract = await getContract();
-    const fee : BigNumber = await contract.getChangeFee();
-    const transaction = await contract?.changePixelColor(
-      tokenId, 
-      BigInt(parseInt(color.slice(1), 16)), 
-      {value : fee}
-    );
-    const output = await transaction.wait();
+    const { runContractFunction: changePixelColor } = useWeb3Contract({
+        ...contractTemplate,
+        functionName : 'changePixelColor',
+        params : {
+          tokenId : tokenId,
+          color : BigInt(parseInt(color.slice(1), 16)),
+        },
+    });
+
+
+    await changePixelColor({
+      onSuccess: onSuccess,
+      onError : (error) => {
+        console.log(error);
+      };
+    });
+
   };
 
   const buyPixel = async (tokenId : bigint, color : string) => {
@@ -82,5 +93,5 @@ export default function useContract() {
 
   const connected = () => window.web3.currentProvider.isMetaMask;
 
-  return { connect, getChunk, connected, isOwner, buyPixel, changePixelColor };
+  return { connect, connected, isOwner, buyPixel, changePixelColor };
 }
