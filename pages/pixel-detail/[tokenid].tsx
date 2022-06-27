@@ -16,6 +16,7 @@ export default function PixelDetail() {
   const [buyMode, setBuyMode] = useState<boolean>(false);
   const contract = useContract();
 
+
   useEffect(() => {
     const id: string = router.query.tokenid?.toString() ?? '0';
     fetchPixel(BigInt(id));
@@ -29,17 +30,20 @@ export default function PixelDetail() {
     const pixel = await response.json();
     dispatch(setSelected(pixel));
 
-    if (contract.connected()) {
-      const owner: boolean = await contract.isOwner(tokenId);
-      setIsOwner(owner);
-    }
+    // const currentUser = Moralis.User.current();
+
+    // if (currentUser != null) {
+    //   const owner: boolean = await contract.isOwner(tokenId);
+    //   setIsOwner(owner);
+    // }
     console.log(pixel);
   }
 
   const onBuyNFT = async () => {
     await contract.buyPixel(
       tokenId,
-      stagingColor
+      stagingColor,
+      async () => {}
     );
     fetchPixel(BigInt(tokenId));
   };
@@ -47,7 +51,8 @@ export default function PixelDetail() {
   const onChangeNFTColor = async () => {
     await contract.changePixelColor(
       tokenId,
-      stagingColor
+      stagingColor,
+      async () => {}
     );
     fetchPixel(BigInt(tokenId));
   }

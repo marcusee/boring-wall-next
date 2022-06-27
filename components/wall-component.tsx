@@ -1,28 +1,13 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react"
 import { GridLoader } from "react-spinners";
-import useContract from "../hooks/use-contract";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { WallPixel, hoverOn, appendChunk } from "../store/reducer/wall.reducer";
-
-
 
 export default function Wall() {
   const wallChunks = useAppSelector(state => state.wallReducer.wallChunks);
   const tailIndex = useAppSelector(state => state.wallReducer.tailIndex);
-
   const dispatch = useAppDispatch();
-  const { connect, getChunk, connected } = useContract();
-
-  useEffect(() => {
-    initLoad();
-
-  }, []);
-
-  const initLoad = async () => {
-    await loadChunk();
-  }
-
   const [overBottom, setOverBottom] = useState(false);
   const [loading, setLoading] = useState<boolean>(false); // Controls to prevent 2x load
   const [headIndex, setHeadIndex] = useState<bigint>(0n);
@@ -30,7 +15,8 @@ export default function Wall() {
   const handleScroll = () => {
     if (overBottom && (window.innerHeight + window.scrollY) < document.body.offsetHeight) {
       setOverBottom(false);
-    } else if (!overBottom && Math.floor(window.innerHeight + window.scrollY) == Math.floor(document.body.offsetHeight)) {
+    } else if (!overBottom && Math.floor(window.innerHeight + window.scrollY) == Math.floor(document.body.offsetHeight) && !loading) {
+      setLoading(true);
       setOverBottom(true);
       onBottom();
     }
@@ -56,12 +42,20 @@ export default function Wall() {
     const list : any = document.getElementById('list');
     if (list == null) return;
     if(list.clientHeight <= window.innerHeight && list.clientHeight) {
+      if (loading) {
+        return;
+      }
       loadChunk();
-
-    }
+    } 
   },[wallChunks]);
 
   async function onBottom() {
+
+    const list : any = document.getElementById('list');
+    if((list?.clientHeight ?? 0) <= window.innerHeight && list.clientHeight) {
+      return;
+    }
+
     if (loading) {
       return;
     }
@@ -69,23 +63,18 @@ export default function Wall() {
   }
 
   async function loadChunk() {
-    if (connected()) {
-      console.log('entered here');
-    }
+    const start = BigInt(headIndex) * 1024n;
     const newIndex = headIndex + 1n;
     setHeadIndex(newIndex);
-    setLoading(true);
-    const start = BigInt(headIndex) * 1024n;
     const url = `./api/wall?limit=1024&start=${start.toString()}`;
     const response = await fetch(url);
     const data = await response.json();
-    setLoading(false);
+    await setLoading(false);
     dispatch(appendChunk(data));
-
   }
 
   if (wallChunks.length === 0)
-    return <div className="flex my-12 flex-col items-center">
+    return <div id="list" className="flex my-12 flex-col items-center">
         <GridLoader />
     </div>
 
@@ -114,10 +103,6 @@ export default function Wall() {
 }
 
 export function WallChunk({ chunk }: { chunk: Array<WallPixel> }) {
-  useEffect(() => {
-
-  }, []);
-
   return (
     <>
       {
@@ -144,9 +129,6 @@ export function WallPixelUI({ pixel }: { pixel: WallPixel }) {
 
 export function WallCoordinateHelper() {
   const hoveredWallPixel = useAppSelector(state => state.wallReducer.hoveredWallPixel);
-
-  useEffect(() => {
-  }, []);
 
   const getX = () => {
     return hoveredWallPixel?.xPos ?? '';
