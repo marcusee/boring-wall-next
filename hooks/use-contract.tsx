@@ -10,6 +10,8 @@ export default function useContract() {
     contractAddress: data.address,
   }
 
+
+
   const changePixelColor = async (tokenId: bigint, color: string, onSuccess: (tx: any) => void) => {
 
     const { runContractFunction: changePixelColor } = useWeb3Contract({
@@ -28,20 +30,19 @@ export default function useContract() {
         console.log(error);
       }
     });
-
   };
 
-  const buyPixel = async (tokenId: bigint, color: string, onSuccess: (tx: any) => void) => {
+  const buyPixel = async (tokenId: bigint, color: string, fee: BigNumber, onSuccess: (tx: any) => void) => {
 
     const { runContractFunction: buyPixel } = useWeb3Contract({
       ...contractTemplate,
       functionName: 'buyPixel',
+      msgValue : fee.toString(),
       params: {
         tokenId: tokenId,
         color: BigInt(parseInt(color.slice(1), 16)),
       },
     });
-
 
     await buyPixel({
       onSuccess: onSuccess,

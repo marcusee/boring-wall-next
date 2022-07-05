@@ -5,22 +5,99 @@ import { fetchFakeChunk, fetchFakePixel, WallPixel, changeStagingColor, setSelec
 import MenuBar from "../../components/menu-bar";
 import { SketchPicker } from 'react-color';
 import useContract from "../../hooks/use-contract";
+import data from '../../../config/boringwall.json';
+import bwallAbi from '../../../boringwall/artifacts/contracts/BoringWall.sol/BoringWall.json';
+import { useWeb3Contract, useMoralis} from "react-moralis";
+import { BigNumber } from "@ethersproject/bignumber";
 
 export default function PixelDetail() {
   const router = useRouter();
+  const {isWeb3Enabled} = useMoralis();
+
   const dispatch = useAppDispatch();
   const wallPixel = useAppSelector(state => state.wallReducer.selected);
   const stagingColor: string = useAppSelector(state => state.wallReducer.stagingColor);
-  const [isOwner, setIsOwner] = useState<boolean>();
+  const [isOwner, setIsOwner] = useState<number>();
   const [tokenId, setTokenId] = useState<bigint>(0n);
   const [buyMode, setBuyMode] = useState<boolean>(false);
   const contract = useContract();
+  const [entraceFee, setEntraceFee] = useState<string>('0');
+  
+  const {runContractFunction: getPrice} = useWeb3Contract({
+    abi : bwallAbi.abi,
+    contractAddress : data.address,
+    functionName : "getPrice",
+  });
 
+
+  const {runContractFunction: ownerOf} = useWeb3Contract({
+    abi : bwallAbi.abi,
+    contractAddress : data.address,
+    functionName : "ownerOf",
+    params: {
+      tokenId : router.query.tokenid?.toString() ?? '0',
+    },
+  });
+
+
+  const { runContractFunction: buyPixel } = useWeb3Contract({
+    abi : bwallAbi.abi,
+    contractAddress : data.address,
+    functionName: 'buyPixel',
+    msgValue: BigNumber.from(entraceFee).toString(),
+    params: {
+      tokenId: tokenId,
+      color: BigInt(parseInt(stagingColor.slice(1), 16)),
+    },
+  });
+
+  const { runContractFunction: changePixelColor } = useWeb3Contract({
+    abi : bwallAbi.abi,
+    contractAddress : data.address,
+    functionName: 'changePixelColor',
+    params: {
+      tokenId: tokenId,
+      color: BigInt(parseInt(stagingColor.slice(1), 16)),
+    },
+  });
 
   useEffect(() => {
     const id: string = router.query.tokenid?.toString() ?? '0';
     fetchPixel(BigInt(id));
+
+    if (isWeb3Enabled) {
+      
+      ownerOf({
+        onSuccess: (v : any) => {
+          console.log(v);
+          setIsOwner(v);
+        },
+        onError: (e) => console.log(e)
+
+      });
+      getPrice({
+        onSuccess: (v : any) => {
+          setEntraceFee(v._hex)
+        }
+      });
+    }
+
   }, []);
+
+
+  useEffect(() => {
+    ownerOf({
+      onSuccess: (v : any) => {
+        setIsOwner(v);
+      }
+    });
+    getPrice({
+      onSuccess: (v : any) => {
+        setEntraceFee(v._hex);
+      }
+    });
+
+  }, [isWeb3Enabled])
 
 
   const fetchPixel = async (tokenId: bigint) => {
@@ -29,6 +106,7 @@ export default function PixelDetail() {
 
     const pixel = await response.json();
     dispatch(setSelected(pixel));
+    dispatch(changeStagingColor(pixel.colorString));
 
     // const currentUser = Moralis.User.current();
 
@@ -40,13 +118,12 @@ export default function PixelDetail() {
   }
 
   const onBuyNFT = async () => {
-    await contract.buyPixel(
-      tokenId,
-      stagingColor,
-      async () => {}
-    );
+    console.log(BigNumber.from(entraceFee));
+    await buyPixel();
     fetchPixel(BigInt(tokenId));
   };
+
+
 
   const onChangeNFTColor = async () => {
     await contract.changePixelColor(
@@ -138,7 +215,7 @@ export default function PixelDetail() {
       <MenuBar />
       <div className="flex py-32 items-center place-content-center justify-evenly w-full flex-col md:flex-row space-y-8">
         <div className="flex space-y-2 flex-col">
-          <h3>Token Id : </h3>
+          <h3>Token Id : {wallPixel.id}</h3>
           <div
             className="w-32 h-32 shadow-2xl "
             style={{
