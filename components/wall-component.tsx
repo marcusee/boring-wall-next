@@ -63,10 +63,10 @@ export default function Wall() {
   }
 
   async function loadChunk() {
-    const start = BigInt(headIndex) * 1024n;
+    const start = BigInt(headIndex) * CHUNK_HEIGHT;
     const newIndex = headIndex + 1n;
     setHeadIndex(newIndex);
-    const url = `./api/wall?limit=1024&start=${start.toString()}`;
+    const url = `./api/wall?limit=${CHUNK_HEIGHT}&start=${start.toString()}`;
     const response = await fetch(url);
     const data = await response.json();
     await setLoading(false);
