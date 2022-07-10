@@ -22,11 +22,19 @@ export default function PixelDetail() {
   const [buyMode, setBuyMode] = useState<boolean>(false);
   const contract = useContract();
   const [entraceFee, setEntraceFee] = useState<string>('0');
+  const [changeFee, setChangeFee] = useState<string>('0');
+
   
   const {runContractFunction: getPrice} = useWeb3Contract({
     abi : bwallAbi.abi,
     contractAddress : data.address,
     functionName : "getPrice",
+  });
+
+  const {runContractFunction: getChangeFee} = useWeb3Contract({
+    abi : bwallAbi.abi,
+    contractAddress : data.address,
+    functionName : "getChangeFee",
   });
 
 
@@ -55,6 +63,7 @@ export default function PixelDetail() {
     abi : bwallAbi.abi,
     contractAddress : data.address,
     functionName: 'changePixelColor',
+    msgValue: BigNumber.from(changeFee).toString(),
     params: {
       tokenId: tokenId,
       color: BigInt(parseInt(stagingColor.slice(1), 16)),
@@ -75,9 +84,16 @@ export default function PixelDetail() {
         onError: (e) => console.log(e)
 
       });
+
       getPrice({
         onSuccess: (v : any) => {
           setEntraceFee(v._hex)
+        }
+      });
+
+      getChangeFee({
+        onSuccess: (v : any) => {
+          setChangeFee(v._hex)
         }
       });
     }
@@ -123,15 +139,10 @@ export default function PixelDetail() {
     fetchPixel(BigInt(tokenId));
   };
 
-
-
   const onChangeNFTColor = async () => {
-    await contract.changePixelColor(
-      tokenId,
-      stagingColor,
-      async () => {}
-    );
-    fetchPixel(BigInt(tokenId));
+    console.log('change pixel');
+    await changePixelColor();
+    // fetchPixel(BigInt(tokenId));
   }
 
   const isOwned = () => {
@@ -200,8 +211,6 @@ export default function PixelDetail() {
         }}>Buy</button>
     </div>
   }
-
-
 
   if (wallPixel == undefined) {
     return <div>
