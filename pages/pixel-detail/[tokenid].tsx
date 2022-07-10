@@ -9,6 +9,7 @@ import data from '../../../config/boringwall.json';
 import bwallAbi from '../../../boringwall/artifacts/contracts/BoringWall.sol/BoringWall.json';
 import { useWeb3Contract, useMoralis} from "react-moralis";
 import { BigNumber } from "@ethersproject/bignumber";
+import { GridLoader } from "react-spinners";
 
 export default function PixelDetail() {
   const router = useRouter();
@@ -130,7 +131,6 @@ export default function PixelDetail() {
     //   const owner: boolean = await contract.isOwner(tokenId);
     //   setIsOwner(owner);
     // }
-    console.log(pixel);
   }
 
   const onBuyNFT = async () => {
@@ -144,7 +144,6 @@ export default function PixelDetail() {
   };
 
   const onChangeNFTColor = async () => {
-    console.log('change pixel');
     await changePixelColor(
       {
         onSuccess : (tx) => {
@@ -152,7 +151,6 @@ export default function PixelDetail() {
         }
       }
     );
-    // fetchPixel(BigInt(tokenId));
   }
 
   const isOwned = () => {
@@ -225,7 +223,9 @@ export default function PixelDetail() {
   if (wallPixel == undefined) {
     return <div>
       <MenuBar />
-      <h2>Loading ....</h2>
+      <div className="flex my-12 flex-col items-center">
+        <GridLoader />
+      </div>
     </div>
   }
 
