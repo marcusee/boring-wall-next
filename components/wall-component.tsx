@@ -4,7 +4,6 @@ import { GridLoader } from "react-spinners";
 import { CHUNK_HEIGHT } from "../configs/wall-config";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { WallPixel, hoverOn, appendChunk, setOnPressedId, setSelectedIndex } from "../store/reducer/wall.reducer";
-import { WallPixel, hoverOn, appendChunk } from "../store/reducer/wall.reducer";
 import throttle from 'lodash.debounce'
 
 export default function Wall() {
