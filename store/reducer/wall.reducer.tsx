@@ -17,6 +17,8 @@ const initialState: WallState = {
   stagingColor : "#FFFFFF",
   contract : null,
   userAddress: '',
+  selectedIndex: null,
+  selectedId: null,
 }; //Initial state
 
 
@@ -40,6 +42,8 @@ export interface WallState {
   stagingColor : string,
   contract: any;
   userAddress: string,
+  selectedIndex : null | number,
+  selectedId : null | string,
 }
 
 export const getNumber = createAsyncThunk(
@@ -116,10 +120,6 @@ export const fetchFakePixel = createAsyncThunk(
   }
 );
 
-function refineRawBatch () {
-
-}
-
 const reducerSlice = createSlice({
   name: 'wallReducer',
   initialState,
@@ -146,8 +146,20 @@ const reducerSlice = createSlice({
     setHeadIndex: (state, action) => {
       state.headIndex = action.payload;
     },
+    setSelectedIndex: (state, action) => {
+      state.selectedIndex = action.payload;
+    },
+    setOnPressedId : (state, action) => {
+      state.selectedId = action.payload;
+
+    },
     setSelected: (state, action) => {
       state.selected = action.payload;
+    },
+    setSelectedColor: (state, action) => {
+      if (state.wallChunks && state.selectedIndex && (state.selectedId == state?.selected?.id)) {
+        state.wallChunks[state.selectedIndex].colorString = action.payload;
+      }
     },
     onBottom: (state) => {
 
@@ -173,6 +185,6 @@ const reducerSlice = createSlice({
 });
 
 
-export const { increment, hoverOn, changeStagingColor, setUserAddress, appendChunk, setSelected, setHeadIndex } = reducerSlice.actions
+export const { increment, setSelectedColor, setOnPressedId, setSelectedIndex, hoverOn, changeStagingColor, setUserAddress, appendChunk, setSelected, setHeadIndex } = reducerSlice.actions
 export const selectWallData = (state: RootState) => state.wallReducer;
 export default reducerSlice.reducer;
