@@ -4,14 +4,16 @@ import { GridLoader } from "react-spinners";
 import { CHUNK_HEIGHT } from "../configs/wall-config";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { WallPixel, hoverOn, appendChunk } from "../store/reducer/wall.reducer";
+import throttle from 'lodash.debounce'
 
 export default function Wall() {
   const wallChunks = useAppSelector(state => state.wallReducer.wallChunks);
   const tailIndex = useAppSelector(state => state.wallReducer.tailIndex);
+  const headIndex = useAppSelector(state => state.wallReducer.headIndex);
+
   const dispatch = useAppDispatch();
   const [overBottom, setOverBottom] = useState(false);
   const [loading, setLoading] = useState<boolean>(false); // Controls to prevent 2x load
-  const [headIndex, setHeadIndex] = useState<bigint>(0n);
 
   const handleScroll = () => {
     if (overBottom && (window.innerHeight + window.scrollY) < document.body.offsetHeight) {
@@ -60,13 +62,13 @@ export default function Wall() {
     if (loading) {
       return;
     }
-    await loadChunk();
+    await throttleLoadChunk();
   }
+
+  const throttleLoadChunk = throttle(loadChunk, 1500);
 
   async function loadChunk() {
     const start = BigInt(headIndex) * CHUNK_HEIGHT;
-    const newIndex = headIndex + 1n;
-    setHeadIndex(newIndex);
     const url = `./api/wall?limit=${CHUNK_HEIGHT}&start=${start.toString()}`;
     const response = await fetch(url);
     const data = await response.json();
