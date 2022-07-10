@@ -32,7 +32,7 @@ export interface WallPixel {
 export interface WallState {
   value: number,
   connected : boolean,
-  wallChunks : WallPixel[][],
+  wallChunks : WallPixel[],
   headIndex : string, // track head chunk index
   tailIndex : string,  // track tail chunk index
   hoveredWallPixel : WallPixel | undefined,
@@ -137,7 +137,7 @@ const reducerSlice = createSlice({
       state.userAddress = action.payload;
     },
     appendChunk: (state, action) => {
-      state.wallChunks.push(action.payload);
+      state.wallChunks = state.wallChunks.concat(action.payload);
       state.headIndex = (BigInt(state.headIndex) + 1n).toString();
     },
     removeOldChunk: (state) => {
@@ -163,11 +163,6 @@ const reducerSlice = createSlice({
       })
       .addCase(connectMetaMask.fulfilled, (state : WallState, action) => {
         console.log(action);
-      })
-      .addCase(fetchFakeChunk.fulfilled, (state: WallState, action) => {
-        state.headIndex = `${BigInt(state.headIndex) + 1n}`;
-        state.wallChunks.push(action.payload);
-   
       })
       .addCase(fetchFakePixel.fulfilled, (state: WallState, action) => {
         state.headIndex = `${BigInt(state.headIndex) + 1n}`;

@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react"
 import { GridLoader } from "react-spinners";
+import { CHUNK_HEIGHT } from "../configs/wall-config";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { WallPixel, hoverOn, appendChunk } from "../store/reducer/wall.reducer";
 
@@ -90,9 +91,11 @@ export default function Wall() {
             <WallCoordinateIndicator />
           </div>
           <div className="grid content-center grid-cols-32 gap-0 shadow-xl">
-            {wallChunks.map((chunk: Array<WallPixel>, key: any) => (
-              <WallChunk key={key} chunk={chunk} />
-            ))}
+            {
+              wallChunks?.map((value: WallPixel, key: any) => {
+                return <WallPixelUI key={key} pixel={value} />
+              })
+            }
           </div>
         </div>
         <div className="py-2"></div>
@@ -102,17 +105,6 @@ export default function Wall() {
   )
 }
 
-export function WallChunk({ chunk }: { chunk: Array<WallPixel> }) {
-  return (
-    <>
-      {
-        chunk?.map((value: WallPixel, key: any) => {
-          return <WallPixelUI key={key} pixel={value} />
-        })
-      }
-    </>
-  )
-}
 
 export function WallPixelUI({ pixel }: { pixel: WallPixel }) {
   const dispatch = useAppDispatch();
