@@ -8,6 +8,7 @@ import { WallPixel, hoverOn, appendChunk, setOnPressedId, setSelectedIndex } fro
 export default function Wall() {
   const wallChunks = useAppSelector(state => state.wallReducer.wallChunks);
   const tailIndex = useAppSelector(state => state.wallReducer.tailIndex);
+
   const dispatch = useAppDispatch();
   const [overBottom, setOverBottom] = useState(false);
   const [loading, setLoading] = useState<boolean>(false); // Controls to prevent 2x load

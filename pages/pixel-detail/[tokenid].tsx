@@ -80,7 +80,6 @@ export default function PixelDetail() {
         onSuccess: (v : any) => {
           console.log(v);
           setIsOwner(v);
-          dispatch(setSelectedColor(stagingColor));
         },
         onError: (e) => console.log(e)
 
@@ -136,7 +135,11 @@ export default function PixelDetail() {
 
   const onBuyNFT = async () => {
     console.log(BigNumber.from(entraceFee));
-    await buyPixel();
+    await buyPixel({
+      onSuccess : () => {
+        dispatch(setSelectedColor(stagingColor));
+      }
+    });
     fetchPixel(BigInt(tokenId));
   };
 

@@ -158,13 +158,8 @@ const reducerSlice = createSlice({
     },
     setSelectedColor: (state, action) => {
       if (state.wallChunks && state.selectedIndex && (state.selectedId == state?.selected?.id)) {
-        state.wallChunks[state.selectedIndex].color = action.payload;
-        console.log('WE HAVE CHANGE THE COLOR IN THE ARRAY')
-      } else {
-        console.log('WE HAVENOT')
-
+        state.wallChunks[state.selectedIndex].colorString = action.payload;
       }
-
     },
     onBottom: (state) => {
 
