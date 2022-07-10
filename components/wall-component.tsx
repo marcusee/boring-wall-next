@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { GridLoader } from "react-spinners";
 import { CHUNK_HEIGHT } from "../configs/wall-config";
 import { useAppSelector, useAppDispatch } from "../store/hooks";
-import { WallPixel, hoverOn, appendChunk } from "../store/reducer/wall.reducer";
+import { WallPixel, hoverOn, appendChunk, setOnPressedId, setSelectedIndex } from "../store/reducer/wall.reducer";
 
 export default function Wall() {
   const wallChunks = useAppSelector(state => state.wallReducer.wallChunks);
@@ -93,7 +93,7 @@ export default function Wall() {
           <div className="grid content-center grid-cols-32 gap-0 shadow-xl">
             {
               wallChunks?.map((value: WallPixel, key: any) => {
-                return <WallPixelUI key={key} pixel={value} />
+                return <WallPixelUI key={key} pixel={value} index={key} />
               })
             }
           </div>
@@ -106,14 +106,18 @@ export default function Wall() {
 }
 
 
-export function WallPixelUI({ pixel }: { pixel: WallPixel }) {
+export function WallPixelUI({ pixel, index }: { pixel: WallPixel, index: any }) {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
   return <div
     data-x={pixel.yPos}
     onMouseEnter={() => dispatch(hoverOn(pixel))}
-    onClick={() => router.push(`/pixel-detail/${pixel.id}`)}
+    onClick={() => {
+      dispatch(setOnPressedId(pixel.id));
+      dispatch(setSelectedIndex(index));
+      router.push(`/pixel-detail/${pixel.id}`)
+    }}
     className="w-4 h-4 hover:border-black hover:border-2"
     style={{ backgroundColor: pixel.colorString }}>
   </div>

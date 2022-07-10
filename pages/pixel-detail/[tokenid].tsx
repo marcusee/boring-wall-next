@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { fetchFakeChunk, fetchFakePixel, WallPixel, changeStagingColor, setSelected } from "../../store/reducer/wall.reducer";
+import { fetchFakeChunk, fetchFakePixel, WallPixel, changeStagingColor, setSelected, setSelectedColor } from "../../store/reducer/wall.reducer";
 import MenuBar from "../../components/menu-bar";
 import { SketchPicker } from 'react-color';
 import useContract from "../../hooks/use-contract";
@@ -80,6 +80,7 @@ export default function PixelDetail() {
         onSuccess: (v : any) => {
           console.log(v);
           setIsOwner(v);
+          dispatch(setSelectedColor(stagingColor));
         },
         onError: (e) => console.log(e)
 
@@ -141,7 +142,13 @@ export default function PixelDetail() {
 
   const onChangeNFTColor = async () => {
     console.log('change pixel');
-    await changePixelColor();
+    await changePixelColor(
+      {
+        onSuccess : (tx) => {
+          dispatch(setSelectedColor(stagingColor));
+        }
+      }
+    );
     // fetchPixel(BigInt(tokenId));
   }
 
